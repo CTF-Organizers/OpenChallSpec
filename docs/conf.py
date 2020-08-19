@@ -55,7 +55,7 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 highlight_language = "yaml"
-rst_epilog = ".. |spec_version| replace:: %s" % release
+master_doc = "index"
 
 
 def replace(app, docname, source):
