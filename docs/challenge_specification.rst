@@ -28,7 +28,7 @@ A challenge is a directory containing a ``challenge.yml`` or ``challenge.yaml`` 
 Schema
 ******
 
-The OCS includes a `JSON Schema<https://json-schema.org/>` for validation of the challenge configuration file structure. Yes, the OCS uses JSON schema to validate a YAML file, but it works the same way as both JSON and YAML files parse to the same "dictionary" representation, and JSON Schema validators in any programming language usually take this dictionary representation as input. Readers MAY validate the configuration against the schema before attempting to interpret the configuration. A configuration file that doesn't comply with the schema is considered invalid. The schema includes default values for all non-required fields, which may be a convenient method of filling in defaults.
+The OCS includes a `JSON Schema <https://json-schema.org/>`_ for validation of the challenge configuration file structure, which can be found `here <https://github.com/CTF-Organizers/OpenChallSpec/blob/dev/challenge.schema.json>`_. Yes, the OCS uses JSON schema to validate a YAML file, but it works the same way as both JSON and YAML files parse to the same "dictionary" representation, and JSON Schema validators in any programming language usually take this dictionary representation as input. Readers MAY validate the configuration against the schema before attempting to interpret the configuration. A configuration file that doesn't comply with the schema is considered invalid. The schema includes default values for all non-required fields, which may be a convenient method of filling in defaults.
 
 ***************************
 Implementation completeness
