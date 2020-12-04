@@ -407,6 +407,8 @@ This field is a simplified syntax of the deployment_ field. It consists of 3 man
           - type: <type>
             internal_port: <internal_port>
             external_port: <external_port>
+    networks: {}
+    volumes: {}
 
 If this field is present, the deployment_ field MUST NOT be present.
 
