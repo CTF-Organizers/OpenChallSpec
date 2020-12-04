@@ -11,16 +11,17 @@ The OpenChallSpec (OCS) is a specification for jeopardy style Capture The Flag c
 The OCS has a few distinct design goals:
 
 - Cover everyone's use cases. If a CTF platform or deployment tool has support for a certain feature, you should be able to configure this feature inside ``challenge.yml`` (within reason).
-- Intercompatibility with every CTF platform and tool. A challenge written using the OCS for a CTF running CTFd should also work with any other CTF platform without issues.
+- Intercompatibility with every CTF platform and tool. A challenge written using the OCS for a CTF running CTFd should also work with any other CTF platform and be painless to import, granted that some features not shared between the platforms may not work.
 - Challenge packageability. A folder containing a challenge should be able to be zipped, committed to a git repository, etc. and sent to another person while retaining all functionality, even if the challenge author and receiving person don't use the same tools or have the same environment.
 
-If you have a use case the OCS doesn't cover, or a feature in your CTF platform not configurable from the OCS, don't hesitate to `submit an issue <TODO>`_ so that it can be added to the spec.
+If you have a use case the OCS doesn't cover, or a feature in your CTF platform not configurable from the OCS, don't hesitate to `submit an issue <https://github.com/CTF-Organizers/OpenChallSpec/issues>`_ so that it can be added to the spec.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :hidden:
 
    making_a_challenge
    advanced_configuration_options
    challenge_examples
    challenge_specification
+   changelog

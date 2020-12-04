@@ -8,7 +8,7 @@ Making a challenge
 Getting Started
 ***************
 
-A challenge is a folder containing a ``challenge.yml`` (or ``challenge.yaml`` if you prefer) configuration file. The ``challenge.yml`` YAML file is the heart of the challenge, defining all metadata like title, description and categories, as well as things like which files players get to download or what services they get access to. A minimal challenge configuration file looks like this:
+A challenge is a folder containing a ``challenge.yml`` (or ``challenge.yaml`` if you prefer) configuration file. The ``challenge.yml`` YAML file is the heart of the challenge, defining all metadata like title, description, and categories, as well as things like which files players get to download or what services they get access to. A minimal challenge configuration file looks like this:
 
 ::
 
@@ -17,7 +17,7 @@ A challenge is a folder containing a ``challenge.yml`` (or ``challenge.yaml`` if
     authors: mateuszdrwal
     categories: misc
 
-    flag_format: example{(.*)}
+    flag_format_prefix: example{
     flags: this_is_the_flag
 
     downloadable_files:
@@ -27,27 +27,11 @@ A challenge is a folder containing a ``challenge.yml`` (or ``challenge.yaml`` if
 
 The first part of the example defines the metadata we are all used to: the title, description, author and category.
 
-Then, the flag format and flag are defined. ``flag_format`` is a regex with exactly one capture group signifying the variable part of the flag. The variable part is defined right below in ``flags``, so the resulting flag of this challenge is ``example{this_is_the_flag}``.
+Then, the flag format and flag are defined. ``flag_format_prefix`` specifies the first part of the flag format. The variable part of the flag is defined right below in ``flags``, so the resulting flag for this challenge is ``example{this_is_the_flag}``.
 
 Later, a ``challenge.txt`` is specified as a file that should be given to players through the ``downloadable_files`` option. The ``challenge.txt`` file has to exist in the same directory as the ``challenge.yml`` file.
 
 Lastly, it is specified that the configuration follows the <<spec_version>> version of OCS. This will usually be the latest version when developing challenges.
-
-********************
-Using a build script
-********************
-
-Often, CTF challenges are built in some way by automated scripts. Sometimes this is compiling a binary, other times a script might be encoding data in an image for a steganography challenge. The OCS includes a standard way of specifying which file to run and how:
-
-::
-
-    build_script: build.sh
-
-At this point, using a command line tool to assist with challenge creation can prove useful. The officially recommended tool is `challtools <TODO>`_, however you may use whichever tool you want. This tutorial will continue giving some examples using challtools.
-
-To run the build script with challtools, run ``challtools build``. Challtools will then extract a valid flag from the challenge configuration and pass it as a command line argument to the build script when it's run. The build script should then embed the flag in the challenge, whether that's writing a `flag.txt` file or any other method.
-
-Using a command line tool with a build script is the recommended way of building challenges as it guarantees the flag in the challenge is the same as the flag specified in the configuration. Of course, there is nothing forcing you to use this functionality. If you want, it is perfectly fine to not use a build script.
 
 ****************
 Adding a service
@@ -59,49 +43,33 @@ Many CTF challenges have a service, which is usually a website or a TCP server. 
 
 ::
 
-    deployment:
-      type: docker
-      containers:
-        web:
-          image: ./container
-          services:
-            - type: website
-              internal_port: 8080
-              external_port: 80
+    service:
+      image: ./container
+      type: website
+      internal_port: 8080
+      external_port: 80
 
-First, ``type: docker`` is defined. The OCS supports adding more deployment types than just docker, but at the moment docker is the only option.
+The docker image is built according to the ``image`` option. In this case, a directory ``container`` is specified, from which the image will be built. The ``container`` directory is assumed to have a ``Dockerfile``. The ``image`` option can also have other values, like a docker image tag or a path to an image archive.
 
-The ``containers`` list is a list of all containers for this challenge. This example (and most challenges) only specifies one container, here called ``web``.
+``type`` can by default be one of ``website`` or ``tcp``, and represents what type of service it is that is exposed. ``internal_port`` then defines at which port this service listens inside the container, and the optional ``external_port`` defines what port should be exposed on the host machine.
 
-The ``web`` container is built according to the ``image`` option. In this case, a directory ``container`` is specified, in which the container will be built when running ``challtools build``. The ``container`` directory is assumed to have a ``Dockerfile``. The ``image`` option can also have other values, like a docker image tag or a path to an image archive.
-
-The ``services`` list defines which services this container exposes. In this case, the container exposes a web app which runs internally on port 8080, to the external port 80. By default, ``type`` can be ``website`` or ``tcp``, but :ref:`custom types can also be defined <custom_service_types_label>`. The ``external_port`` option is optional, and if omitted, a port will be assigned automatically.
-
-You can use challtools to start the services according to the configuration by running ``challtools start``.
+At this point, using a command line tool to assist with challenge creation can prove useful. The officially recommended tool is `challtools <TODO>`_, however you may use whichever you like, or none at all. Challtools can build the docker image for you as defined in the config simply by running ``challtools build``. You can also start the service locally by running ``challtools start``.
 
 *********************
 Adding a solve script
 *********************
 
-A solve script can be useful locally during development to check that the challenge is working properly, but it can also be used to check if a service is online by periodically running it against the service during the competition. To add a solve script to your challenge, add one of the below into your configuration:
+.. note:: This is a useful but uncommonly supported feature on competition infrastructure. It is usually perfectly fine to not have a solve script.
+
+A solve script can be useful locally during development to check that the challenge is working properly, but it can also be used to check if a service is online by periodically running it against the service during the competition. To add a solve script to your challenge, add the following into your configuration:
 
 ::
 
-    solution:
-      type: docker
-      image: ./solution
+    solution_image: ./solution
 
-::
+This option behaves similarly to the ``image`` option :ref:`above <docker-config>`. In this case, a docker image will be built from the ``solution`` directory. To test if a challenge is solvable, this image will be ran with the challenge location as command line arguments. For example, for a TCP service a string like ``203.0.113.43:1337`` will be passed. For a website service, it will be the URL. Therefore, if you are using a container, make sure it runs the script using ``ENTRYPOINT`` in `exec form <https://docs.docker.com/engine/reference/builder/#entrypoint>`_ instead of ``CMD`` in the ``Dockerfile`` so that command line arguments get passed correctly. The container should output just the flag on STDOUT if the challenge was solved successfully.
 
-    solution:
-      type: script
-      script: solve.sh
-
-The difference between these is that one is a docker container, and one is a raw script. Usually, CTF infrastructures will support running containers against live services, but not the raw scripts as they are harder to handle and may require unavailable dependencies. It is therefore recommended that you create a container solve script if the challenge has a service that you want to monitor solvability of during the competition, and using a raw script is perfectly acceptable if the challenge does not have a service. Again, this is just recommendation, and you are free to do whatever.
-
-The ``docker`` configuration type takes an ``image`` option the same way as regular containers :ref:`above <docker-config>`. The ``script`` type takes a ``script`` option that is a solution script file.
-
-Solve scripts will be run with the service as a command line argument. For example, for a TCP service a string like ``203.0.113.43:1337`` will be passed. For a website service, it will be the URL. Therefore, if you are using a container, make sure it runs the script using ``ENTRYPOINT`` in `exec form <https://docs.docker.com/engine/reference/builder/#entrypoint>`_ instead of ``CMD`` in the ``Dockerfile`` so that command line arguments get passed correctly.
+If this seems complicated, check out the practical TODO example.
 
 ********************
 Other common options
@@ -112,7 +80,7 @@ Below is a list of other commonly used configuration options. Some of these were
 authors
 =======
 
-The ``authors`` option can be a string for simplicity, but it can also array for when there are multiple authors.
+The ``authors`` option can be a string for simplicity, but it can also be an array for when there are multiple authors.
 
 ::
 
@@ -130,6 +98,11 @@ Similarly to authors_, the ``categories`` option can be a string for simplicity 
     categories:
       - web
       - forensics
+
+flag_format_prefix and flag_format_suffix
+=========================================
+
+``flag_format_prefix`` and ``flag_format_suffix`` together define the flag format for the challenge. ``flag_format_suffix`` defaults to ``}``, so it should rarely be needed (unless you are using a non-standard flag format, to which I say please don't). ``flag_format_prefix`` does not have a default so it needs to be specified in every challenge, for example ``exampleCTF{``. If the challenge does not include a flag format, flag_format_prefix should be set to ``null`` in which case both options will be ignored.
 
 tags
 ====
@@ -170,7 +143,7 @@ If you are using static scoring, specify the challenge score here. A value of ``
 predefined_services
 ===================
 
-If you are deploying challenges manually or have some external unchanging service, you will want to define services using ``predefined_services``. These will show to users exactly the same as services defined in ``deployments``, but they are not managed automatically. Usually, services are either of type ``website``, in which case you need to specify ``url``, or of type ``tcp``, in which case you need to specify ``host`` and ``port``. If needed, :ref:`custom types can also be defined <custom_service_types_label>`.
+If you are deploying challenges manually or have some external unchanging service, you will want to define services using ``predefined_services``. These will show to users exactly the same as the service defined in ``service``, but they are not managed automatically. Usually, services are either of type ``website``, in which case you need to specify ``url``, or of type ``tcp``, in which case you need to specify ``host`` and ``port``. If needed, :ref:`custom types can also be defined <custom_service_types_label>`.
 
 ::
 

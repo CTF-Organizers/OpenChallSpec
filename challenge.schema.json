@@ -6,7 +6,7 @@
         "description",
         "authors",
         "categories",
-        "flag_format",
+        "flag_format_prefix",
         "flags",
         "spec"
     ],
@@ -74,8 +74,15 @@
                 }
             }
         },
-        "flag_format": {
-            "type": "string"
+        "flag_format_prefix": {
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "flag_format_suffix": {
+            "type": "string",
+            "default": "}"
         },
         "flags": {
             "type": [
@@ -233,120 +240,142 @@
                 ]
             }
         },
+        "service": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "default": null,
+            "required": [
+                "image",
+                "type",
+                "internal_port"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "internal_port": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "external_port": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
         "deployment": {
             "type": [
                 "object",
                 "null"
             ],
             "default": null,
-            "oneOf": [
-                {
-                    "required": [
-                        "type",
-                        "containers"
-                    ],
-                    "additionalProperties": false,
-                    "properties": {
-                        "type": {
-                            "const": "docker"
-                        },
-                        "containers": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "required": [
-                                    "image"
+            "required": [
+                "type",
+                "containers"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "const": "docker"
+                },
+                "containers": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "required": [
+                            "image"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "image": {
+                                "type": "string"
+                            },
+                            "services": {
+                                "type": [
+                                    "array"
                                 ],
-                                "additionalProperties": false,
-                                "properties": {
-                                    "image": {
-                                        "type": "string"
-                                    },
-                                    "services": {
-                                        "type": [
-                                            "array"
-                                        ],
-                                        "default": [],
-                                        "items": {
-                                            "type": "object",
-                                            "required": [
-                                                "type",
-                                                "internal_port",
-                                                "external_port"
-                                            ],
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "type": {
-                                                    "type": "string"
-                                                },
-                                                "internal_port": {
-                                                    "type": "integer",
-                                                    "minimum": 0
-                                                },
-                                                "external_port": {
-                                                    "type": "integer",
-                                                    "minimum": 0
-                                                }
-                                            }
+                                "default": [],
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "type",
+                                        "internal_port",
+                                        "external_port"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "type": {
+                                            "type": "string"
+                                        },
+                                        "internal_port": {
+                                            "type": "integer",
+                                            "minimum": 0
+                                        },
+                                        "external_port": {
+                                            "type": "integer",
+                                            "minimum": 0
                                         }
-                                    },
-                                    "extra_exposed_ports": {
-                                        "type": [
-                                            "array"
-                                        ],
-                                        "default": [],
-                                        "items": {
-                                            "type": "object",
-                                            "required": [
-                                                "internal_port",
-                                                "external_port"
-                                            ],
-                                            "additionalProperties": false,
-                                            "properties": {
-                                                "internal_port": {
-                                                    "type": "integer",
-                                                    "minimum": 0
-                                                },
-                                                "external_port": {
-                                                    "type": "integer",
-                                                    "minimum": 0
-                                                }
-                                            }
+                                    }
+                                }
+                            },
+                            "extra_exposed_ports": {
+                                "type": [
+                                    "array"
+                                ],
+                                "default": [],
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "internal_port",
+                                        "external_port"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "internal_port": {
+                                            "type": "integer",
+                                            "minimum": 0
+                                        },
+                                        "external_port": {
+                                            "type": "integer",
+                                            "minimum": 0
                                         }
                                     }
                                 }
                             }
-                        },
-                        "networks": {
-                            "type": [
-                                "object"
-                            ],
-                            "default": {},
+                        }
+                    }
+                },
+                "networks": {
+                    "type": [
+                        "object"
+                    ],
+                    "default": {},
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "volumes": {
+                    "type": [
+                        "object"
+                    ],
+                    "default": {},
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
                             "minProperties": 1,
-                            "items": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "volumes": {
-                            "type": [
-                                "object"
-                            ],
-                            "default": {},
-                            "minProperties": 1,
-                            "items": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "minProperties": 1,
-                                    "maxProperties": 1
-                                }
-                            }
+                            "maxProperties": 1
                         }
                     }
                 }
-            ]
+            }
         },
         "solution": {
             "type": [
@@ -373,22 +402,6 @@
                             "type": "string"
                         }
                     }
-                },
-                {
-                    "type": "object",
-                    "required": [
-                        "type",
-                        "script"
-                    ],
-                    "additionalProperties": false,
-                    "properties": {
-                        "type": {
-                            "const": "script"
-                        },
-                        "script": {
-                            "type": "string"
-                        }
-                    }
                 }
             ]
         },
@@ -408,13 +421,6 @@
                 "boolean"
             ],
             "default": false
-        },
-        "build_script": {
-            "type": [
-                "string",
-                "null"
-            ],
-            "default": null
         },
         "release_delay": {
             "type": [

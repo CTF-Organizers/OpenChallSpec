@@ -8,11 +8,12 @@ Here are all other options not explained in :doc:`making_a_challenge`. Some opti
 flags
 *****
 
-The ``flags`` option supports specifying multiple flags, and also regex flags. To do this, use the following syntax:
+The flags_ option supports specifying multiple flags, and also regex flags. To do this, use the following syntax:
 
 ::
 
-    flag_format: example{(.*)}
+    flag_format_prefix: example{
+    flag_format_suffix: "}"
     flags:
     - flag: here_is_a_text_flag
       type: text
@@ -33,7 +34,7 @@ When making a regex flag, be sure to wrap the regex in ``^`` and ``$``, which ma
 max_attempts
 ************
 
-If a team should only have a certain number of attempts at submitting the correct flag before they are blocked, specify this number in the ``max_attempts`` option. In most cases, this is not something you want to do, as this leads to teams creating alt accounts and testing flags there to not be locked out of their main one. If you are looking at a way to stop people from brute forcing flags, rate limiting is usually a better idea. This option should really only be used in closed CTFs where only admins can create team accounts which they distribute to teams. The default is ``null``, which signifies no limit.
+If a team should only have a certain number of attempts at submitting the correct flag before they are blocked, specify this number in the max_attempts_ option. In most cases, this is not something you want to do, as this leads to teams creating alt accounts and testing flags there to not be locked out of their main one. If you are looking at a way to stop people from brute forcing flags, rate limiting is usually a better idea. This option should really only be used in closed CTFs where only admins can create team accounts which they distribute to teams. The default is ``null``, which signifies no limit.
 
 ::
 
@@ -43,7 +44,7 @@ If a team should only have a certain number of attempts at submitting the correc
 downloadable_files
 ******************
 
-Like most other options, ``downloadable_files`` can be either a single string or a list of strings. In addition to specifying a path to a file, a directory or a URL can also be specified. In the case of a directory, all files within it will be included. For the URL, it will be forwarded to the user raw, meaning it does not have to lead to a direct download.
+Like most other options, downloadable_files_ can be either a single string or a list of strings. In addition to specifying a path to a file, a directory or a URL can also be specified. In the case of a directory, all files within it will be included. For the URL, it will be forwarded to the user raw, meaning it does not have to lead to a direct download.
 
 ::
 
@@ -83,7 +84,7 @@ For the sake of example, lets say predefined_services looks like this:
 
 The ``user_display`` option specifies how this service is displayed to players. In this case, players would receive the string ``htjp://203.0.113.43:1337`` as the service. If the challenge uses ``deployment`` to deploy a ``htjp`` type service, the formatting options provided will be ``host`` containing the ip/DNS resolvable hostname, ``port`` containing the port, and ``url`` containing the host and port formatted as a proper http URL. You can use other formatting options, but in that case you must either write a custom deployment backend that provides those options or use predefined_services, where you can define arbitrary formatting options.
 
-The ``solve_script_display`` option is similar to ``user_display``, but defines how the solve script is run against the service. in this case, the solve script would be run with the service command line argument like this: ``./solve_script 203.0.113.43:1337``.
+The ``solve_script_display`` option is similar to ``user_display``, but defines how the solve script is run against the service. in this case, the solve script would be run with the service command line argument like this: ``docker run solve_script 203.0.113.43:1337``.
 
 The ``hyperlink`` option defines if a CTF platform should make the service clickable and openable in a browser.
 
@@ -107,7 +108,7 @@ Keep in mind that because they cannot be overwritten, the above snippet is not v
 deployment
 **********
 
-The ``deployment`` option has many buttons to push and knobs to twist. Support for these varies depending on what you use to deploy the challenge. A full configuration, using all features, looks like this:
+The deployment_ option is a more complicated version of the ``service`` option used in :doc:`making_a_challenge`, with many more features. Support for these varies depending on what you use to deploy the challenge. A full configuration, using all features, looks like this (making a challenge that looks like this is a bad idea, but we will get to that)
 
 ::
 
@@ -120,7 +121,6 @@ The ``deployment`` option has many buttons to push and knobs to twist. Support f
             - type: website
               internal_port: 8080
               external_port: 80
-          
           extra_exposed_ports:
             - internal_port: 1337
               external_port: 1337
@@ -145,13 +145,15 @@ Now that all containers are defined, ``networks`` are defined. One network named
 
 Lastly, shared volumes are defined. A volume called ``test-volume`` is created, which is mounted at ``/shared_volume`` in both ``web`` and ``db`` containers.
 
+Making a deployment that looks like this is a bad idea, as support for these features is not expected to be widespread. Unless it's required, it's better to use as few deployment features as possible for simplicity, like using only one container, no networks, no volumes, etc. In practice, the ``deployment`` option should very rarely be used as the ``service`` option already provides enough functionality for the vast majority of challenges and should be used instead.
+
 .. _unlocked_by_label:
 
 ***********
 unlocked_by
 ***********
 
-Similarly to other options, ``unlocked_by`` can be either a string or a list of strings. For behaviour relating to when a challenge should be unlocked if it has multiple requirements, see all_unlocked_by_required_. The recommended way to specify which challenge is a requirement for this challenge is by setting the string to its challenge_id_. The exact title of the challenge can also be specified, however this can cause errors if the required challenge is renamed.
+Similarly to other options, unlocked_by_ can be either a string or a list of strings. For behaviour relating to when a challenge should be unlocked if it has multiple requirements, see all_unlocked_by_required_. The recommended way to specify which challenge is a requirement for this challenge is by setting the string to its challenge_id_. The exact title of the challenge can also be specified, however this can cause errors if the required challenge is renamed.
 
 ::
 
@@ -163,7 +165,7 @@ Similarly to other options, ``unlocked_by`` can be either a string or a list of 
 all_unlocked_by_required
 ************************
 
-This option is a boolean. If ``true``, all challenges in the `unlocked_by`_ list must be solved in order for this challenge to be accessible. If ``false``, only one challenge from the list needs to be solved. Defaults to ``false``.
+This option is a boolean. If ``true``, all challenges in the unlocked_by_ list must be solved in order for this challenge to be accessible. If ``false``, only one challenge from the list needs to be solved. Defaults to ``false``.
 
 ::
 
@@ -173,7 +175,7 @@ This option is a boolean. If ``true``, all challenges in the `unlocked_by`_ list
 release_delay
 *************
 
-If the challenge should be automatically released/published after a certain time since the CTF started, specify the number of seconds in ``release_delay``. Defaults to 0.
+If the challenge should be automatically released/published after a certain time since the CTF started, specify the number of seconds in release_delay_. Defaults to 0.
 
 ::
 
@@ -183,7 +185,7 @@ If the challenge should be automatically released/published after a certain time
 human_metadata
 **************
 
-``human_metadata`` unsurprisingly contains metadata intended to be read and processed by humans. Filling this in isn't in any way required, but it's nice to have for people that might look at your challenge source in the future.
+human_metadata_ unsurprisingly contains metadata intended to be read and processed by humans. Filling this in isn't in any way required, but it's nice to have for people that might look at your challenge source in the future.
 
 ::
 
@@ -199,7 +201,7 @@ human_metadata
 challenge_id
 ************
 
-to uniquely identify a challenge in unlocked_by_ and perhaps across your infrastructure you can set ``challenge_id`` to a unique string. It is recommended to generate a UUID at creation time and use it, as it effectively guarantees a unique id for every challenge in existence. This is not a requirement though, and the id can be any string. It should however be something unique, even beyond the scope of your CTF. Defaults to ``null``.
+To uniquely identify a challenge in unlocked_by_ and perhaps across your infrastructure you can set challenge_id_ to a unique string. It is recommended to generate a UUID at creation time and use it, as it effectively guarantees a unique id for every challenge in existence. This is not a requirement though, and the id can be any string. It should however be something unique, even beyond the scope of your CTF. Defaults to ``null``.
 
 ::
 
@@ -209,6 +211,12 @@ to uniquely identify a challenge in unlocked_by_ and perhaps across your infrast
 custom
 ******
 
-If you are writing your own infrastructure and have an obscure requirement the OCS doesn't support, you might find the ``custom`` option useful. ``custom`` is an object that you can format however you want, and there are no constraints on what you can put in it. If you for example want to play a different video when a team solves a challenge depending on which challenge they solve, a ``solve_video_url`` option would not be a good fit to include with the OCS as it's very obscure, but it can easily be configured by including it in ``custom``.
+If you are writing your own infrastructure and have an obscure requirement the OCS doesn't support, you might find the custom_ option useful. custom_ is an object that you can format however you want, and there are no constraints on what you can put in it. If you for example want to play a different video when a team solves a challenge depending on which challenge they solve, a ``solve_video_url`` option would not be a good fit to include with the OCS as it's very obscure, but it can easily be configured by including it in custom_.
 
-``custom`` may also be a good choice if there is a feature you are waiting for to be added into the OCS, but hasn't arrived yet and you need to use it now.
+custom_ may also be a good choice if there is a feature you are waiting for to be added into the OCS, but hasn't arrived yet and you need to use it now.
+
+****
+spec
+****
+
+This is the version of the OCS the challenge configuration is written in. These docs are written for version <<spec_version>>, so this is probably what the spec_ should be set to if you are following these docs.
