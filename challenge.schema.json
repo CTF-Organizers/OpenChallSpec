@@ -121,7 +121,7 @@
         },
         "score": {
             "type": [
-                "integer",
+                "number",
                 "null"
             ],
             "default": null
@@ -410,6 +410,7 @@
         },
         "human_metadata": {
             "type": "object",
+            "default": {},
             "additionalItems": false,
             "properties": {
                 "challenge_version": {

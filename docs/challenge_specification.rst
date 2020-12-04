@@ -92,7 +92,7 @@ categories
     * - Type
       - String, Array of strings
 
-The challenge's categories. |strarr| The first item in the array MAY be considered the main category. If the reader does not support multiple categories, the first one MUST be used.
+The challenge's categories. |strarr| The first item in the array MAY be considered the main category. If the reader does not support multiple categories, the first one MUST be used. There MUST be at least one category.
 
 tags
 ====
@@ -105,7 +105,7 @@ tags
     * - Type
       - String, Array of strings
     * - Default
-      - [``]``
+      - []
 
 The challenge's tags. |strarr| The first item in the array MAY be considered the main tag.
 
@@ -122,7 +122,7 @@ hints
     * - Type
       - Array of objects
     * - Default
-      - [``]``
+      - []
 
 An array of the challenge's hints. If supported, these MUST be shown to players. Some hints cost points, in which case the action of opening a hint should subtract the price from the opening teams point total.
 
@@ -241,7 +241,7 @@ max_attempts
     * - Required
       - false
     * - Type
-      - Number, null
+      - Integer, null
     * - Default
       - null
 
@@ -391,7 +391,9 @@ service
     * - Required
       - false
     * - Type
-      - Object
+      - Object, null
+    * - Default
+      - null
 
 This field is a simplified syntax of the deployment_ field. It consists of 3 mandatory fields ``image``, ``type`` and ``internal_port``, and one optional field ``external_port``. When this field is present, assume that the deployment_ field has the following contents where ``<field name>`` is replaced by the contents of this service_ field:
 
@@ -417,7 +419,9 @@ deployment
     * - Required
       - false
     * - Type
-      - Object
+      - Object, null
+    * - Default
+      - null
 
 Defines in detail all services that are used by the challenge. At the top level, the object consists of the following fields:
 
@@ -663,7 +667,7 @@ all_unlocked_by_required
     * - Type
       - Boolean
     * - Default
-      - true
+      - false
 
 If unlocked_by_ contains multiple challenges, defines if one or all need to be solved for this challenge to unlock. If ``true``, all challenges in the array MUST be solved for this challenge to be accessible. If ``false``, any one of the challenges in the array MUST be solved for this challenge to be accessible.
 
@@ -676,7 +680,7 @@ release_delay
     * - Required
       - false
     * - Type
-      - Integer
+      - Number
     * - Default
       - 0
 
