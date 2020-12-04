@@ -377,33 +377,12 @@
                 }
             }
         },
-        "solution": {
+        "solution_image": {
             "type": [
-                "object",
+                "string",
                 "null"
             ],
-            "default": null,
-            "oneOf": [
-                {
-                    "const": null
-                },
-                {
-                    "type": "object",
-                    "required": [
-                        "type",
-                        "image"
-                    ],
-                    "additionalProperties": false,
-                    "properties": {
-                        "type": {
-                            "const": "docker"
-                        },
-                        "image": {
-                            "type": "string"
-                        }
-                    }
-                }
-            ]
+            "default": null
         },
         "unlocked_by": {
             "type": [

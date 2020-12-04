@@ -349,7 +349,7 @@ solve_script_display
       * - Type
         - String
 
-  This behaves almost the same as user_display_ above. The difference is that instead of showing the resulting string to the user, it is showed to the solution_ script by passing it as a command line argument.
+  This behaves almost the same as user_display_ above. The difference is that instead of showing the resulting string to the user, it is showed to the solution_image_ script by passing it as a command line argument.
 
 hyperlink
 ---------
@@ -620,8 +620,8 @@ While it is supported, it is highly RECOMMENDED that challenges are created with
 
 If this field is present, the service_ field MUST NOT be present.
 
-solution
-========
+solution_image
+==============
 
 .. list-table::
     :stub-columns: 1
@@ -629,49 +629,25 @@ solution
     * - Required
       - false
     * - Type
-      - Object
+      - String, null
     * - Default
-      - {}
+      - null
 
 A solution script that can be run to validate the challenge is functioning and solvable. This is meant mostly to test challenges with services, and could be run periodically during a CTF to validate that a challenge has not gone offline or broke in other ways. The solution is housed in a docker container so it can be run anywhere. 
 
-This field is composed of the following two sub-fields:
+The string defines the docker image for this solution. This can be defined in the same ways as :ref:`the image in a service container<deploy-image>`.
 
-type
-----
-  .. list-table::
-      :stub-columns: 1
+The solution container usually needs to know on which host and port a service runs on. This information is passed as strings as command line arguments when running a docker container. The strings are formatted the way they are defined in solve_script_display_, meaning that for ``tcp`` challenges a string like ``192.0.2.69:1337`` will be used and for ``website`` challenges the service URL will be used.
 
-      * - Required
-        - true
-      * - Type
-        - string
+If a challenge has multiple services, they MUST be passed in the following order:
+1. All predefined_services_, in the order they are defined
+2. For all containers_ in the order they are defined: all services_, in the order they are defined
 
-  Currently, only the ``docker`` type is supported, so this MUST be the value. In the future more backends may be supported, like LXC or some jails.
+When creating the container, be sure to use `ENTRYPOINT in exec form <https://docs.docker.com/engine/reference/builder/#entrypoint>`_ as otherwise the command line arguments will not work. Using ``CMD`` instead will not work.
 
-image
------
-  .. list-table::
-      :stub-columns: 1
+The solution container must be run with an environment variable ``FLAG``, containing the first ``text``-type flags_ entry enclosed in the flag format (a valid flag). If no such entry exists, the environment variable MUST be set to an empty string.
 
-      * - Required
-        - true
-      * - Type
-        - string
-
-  Defines the docker image for this solution. This can be defined in the same ways as :ref:`the image in a service container<deploy-image>`.
-
-  The solution container usually needs to know on which host and port a service runs on. This information is passed as strings as command line arguments when running a docker container. The strings are formatted the way they are defined in solve_script_display_, meaning that for ``tcp`` challenges a string like ``192.0.2.69:1337`` will be used and for ``website`` challenges the service URL will be used.
-
-  If a challenge has multiple services, they MUST be passed in the following order:
-  1. All predefined_services_, in the order they are defined
-  2. For all containers_ in the order they are defined: all services_, in the order they are defined
-
-  When creating the container, be sure to use `ENTRYPOINT in exec form <https://docs.docker.com/engine/reference/builder/#entrypoint>`_ as otherwise the command line arguments will not work. Using ``CMD`` instead will not work.
-
-  The solution container must be run with an environment variable ``FLAG``, containing the first ``text``-type flags_ entry enclosed in the flag format (a valid flag). If no such entry exists, the environment variable MUST be set to an empty string.
-
-  If the challenge is functioning as expected, the solution container MUST output nothing more than a valid flag and optionally a trailing newline. Scripts that run this solution container SHOULD strip the resulting flag from whitespace on both ends before validating, in order to prevent rouge whitespace from invalidating the flag. Any output that is not a valid flag should be treated as if the service is malfunctioning.
+If the challenge is functioning as expected, the solution container MUST output nothing more than a valid flag and optionally a trailing newline. Scripts that run this solution container SHOULD strip the resulting flag from whitespace on both ends before validating, in order to prevent rouge whitespace from invalidating the flag. Any output that is not a valid flag should be treated as if the service is malfunctioning.
 
 unlocked_by
 ===========
