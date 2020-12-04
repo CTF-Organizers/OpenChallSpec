@@ -296,22 +296,20 @@ custom_service_types
     * - Default
       - []
 
-A list of custom service types. A service type is a concept that defines how services should be automatically shown to players and solve scripts. It is used in definitions of predefined_services_, service_ and deployment_. There are two built-in service types. they look like this:
+A list of custom service types. A service type is a concept that defines how services should be automatically shown to players. It is used in definitions of predefined_services_, service_ and deployment_. There are two built-in service types. they look like this:
 
 ::
 
     - type: website
       user_display: "{url}"
-      solve_script_display: "{url}"
       hyperlink: true
     - type: tcp
       user_display: "nc {host} {port}"
-      solve_script_display: "{host}:{port}"
       hyperlink: false
 
 These built-ins MUST be treated as if they are always the first two items in the array. For example, if the custom_service_types array contains only a newly defined type ``foo``, the reader MUST treat the list of defined types as containing ``website``, ``tcp`` and ``foo``. Duplicate types MUST NOT be allowed. Therefore, ``website`` and ``tcp`` cannot be redefined.
 
-Each object in the custom_service_types array has the following 4 fields:
+Each object in the custom_service_types array has the following 3 fields:
 
 type
 ----
@@ -323,7 +321,7 @@ type
       * - Type
         - String
 
-  The name of the type that is being defined. Can be any string.
+  The name of the type that is being defined. Can be any string that is not an already defined type.
 
 user_display
 ------------
@@ -335,21 +333,9 @@ user_display
       * - Type
         - String
 
-  Defines how services with this type will be shown to the players. Variables can be substituted in by typing the variable name immediately enclosed in curly brackets. Additional whitespace between the name and bracket MUST NOT be supported. For example, for the ``tcp`` service type, if the hostname of a service is ``192.0.2.69`` and the port is ``1337``, the ctf platform will show the string ``nc 192.0.2.69 1337`` in the challenge details.
+  Defines how services with this type will be shown to players. Variables can be substituted in by typing the variable name immediately enclosed in curly brackets. Additional whitespace between the name and bracket MUST NOT be supported. For example, for the ``tcp`` service type, if the hostname of a service is ``192.0.2.69`` and the port is ``1337``, the ctf platform will show the string ``nc 192.0.2.69 1337`` in the challenge details.
 
-  The variables in the substitution context depend on the environment. If the service is in predefined_services_, all needed variables should be provided in that same object. Otherwise, if the service is automatically deployed with a service_ or deployment_ configuration, it is the job of the deployment script to provide a context with the required variables.
-
-solve_script_display
---------------------
-  .. list-table::
-      :stub-columns: 1
-
-      * - Required
-        - true
-      * - Type
-        - String
-
-  This behaves almost the same as user_display_ above. The difference is that instead of showing the resulting string to the user, it is showed to the solution_image_ script by passing it as a command line argument.
+  The variables in the substitution context depend on the environment. If the service is in predefined_services_, all needed variables MUST be provided in that same object. Otherwise, if the service is automatically deployed with a service_ or deployment_ configuration, it is the job of the deployment script to provide a context with the required variables. Deployment scripts MUST attempt to deploy services of a custom type they don't know of and format user_display by providing the ``host``, ``port`` and ``url`` variables in the substitution context.
 
 hyperlink
 ---------
@@ -394,7 +380,7 @@ type
 
   The service type for this service. MUST be either ``website``, ``tcp``, or one defined in custom_service_types_. See custom_service_types_ for info on what a service type is.
 
-All other fields are formatting context for formatting user_display_ and solve_script_display_. Therefore, if the service type is ``website``, a ``url`` field must be passed. If the object is instead ``tcp``, a ``hostname`` and ``ip`` field must be passed.
+All other fields are formatting context for formatting user_display_. Therefore, if the service type is ``website``, a ``url`` field must be passed. If the object is instead ``tcp``, a ``hostname`` and ``ip`` field must be passed.
 
 service
 =======
@@ -637,15 +623,15 @@ A solution script that can be run to validate the challenge is functioning and s
 
 The string defines the docker image for this solution. This can be defined in the same ways as :ref:`the image in a service container<deploy-image>`.
 
-The solution container usually needs to know on which host and port a service runs on. This information is passed as strings as command line arguments when running a docker container. The strings are formatted the way they are defined in solve_script_display_, meaning that for ``tcp`` challenges a string like ``192.0.2.69:1337`` will be used and for ``website`` challenges the service URL will be used.
+The solution container usually needs to know on which host and port a service runs on. This information is passed as a string in a command line argument when running a docker container. The string MUST be formatted by separating the host and port of the service with a colon, like this: ``192.0.2.69:1337``
 
-If a challenge has multiple services, they MUST be passed in the following order:
+If a challenge has multiple services, they MUST be passed as separate command line arguments in the following order:
 1. All predefined_services_, in the order they are defined
 2. For all containers_ in the order they are defined: all services_, in the order they are defined
 
-When creating the container, be sure to use `ENTRYPOINT in exec form <https://docs.docker.com/engine/reference/builder/#entrypoint>`_ as otherwise the command line arguments will not work. Using ``CMD`` instead will not work.
+When creating the container, be sure to use `ENTRYPOINT in exec form <https://docs.docker.com/engine/reference/builder/#entrypoint>`_ as otherwise the command line arguments will not be passed to the entrypoint in the container. Using ``CMD`` instead will not work.
 
-The solution container must be run with an environment variable ``FLAG``, containing the first ``text``-type flags_ entry enclosed in the flag format (a valid flag). If no such entry exists, the environment variable MUST be set to an empty string.
+The solution container MUST be run with an environment variable ``FLAG``, containing the first ``text``-type flags_ entry enclosed in the flag format (a valid flag). If no such entry exists, the environment variable MUST be set to an empty string.
 
 If the challenge is functioning as expected, the solution container MUST output nothing more than a valid flag and optionally a trailing newline. Scripts that run this solution container SHOULD strip the resulting flag from whitespace on both ends before validating, in order to prevent rouge whitespace from invalidating the flag. Any output that is not a valid flag should be treated as if the service is malfunctioning.
 

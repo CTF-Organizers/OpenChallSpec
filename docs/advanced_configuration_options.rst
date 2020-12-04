@@ -70,7 +70,6 @@ By default, ``website`` and ``tcp`` service types are defined, which should be s
     custom_service_types:
       - type: htjp
         user_display: "htjp://{host}:{port}"
-        solve_script_display: "{host}:{port}"
         hyperlink: false # defaults to false
 
 For the sake of example, lets say predefined_services looks like this:
@@ -84,8 +83,6 @@ For the sake of example, lets say predefined_services looks like this:
 
 The ``user_display`` option specifies how this service is displayed to players. In this case, players would receive the string ``htjp://203.0.113.43:1337`` as the service. If the challenge uses ``deployment`` to deploy a ``htjp`` type service, the formatting options provided will be ``host`` containing the ip/DNS resolvable hostname, ``port`` containing the port, and ``url`` containing the host and port formatted as a proper http URL. You can use other formatting options, but in that case you must either write a custom deployment backend that provides those options or use predefined_services, where you can define arbitrary formatting options.
 
-The ``solve_script_display`` option is similar to ``user_display``, but defines how the solve script is run against the service. in this case, the solve script would be run with the service command line argument like this: ``docker run solve_script 203.0.113.43:1337``.
-
 The ``hyperlink`` option defines if a CTF platform should make the service clickable and openable in a browser.
 
 The default ``website`` and ``tcp`` types cannot be overwritten. They are defined thusly:
@@ -95,11 +92,9 @@ The default ``website`` and ``tcp`` types cannot be overwritten. They are define
     custom_service_types:
       - type: website
         user_display: "{url}"
-        solve_script_display: "{url}"
         hyperlink: true
       - type: tcp
         user_display: "nc {host} {port}"
-        solve_script_display: "{host}:{port}"
         hyperlink: false
 
 Keep in mind that because they cannot be overwritten, the above snippet is not valid according to the OCS if it was inserted into a configuration file.

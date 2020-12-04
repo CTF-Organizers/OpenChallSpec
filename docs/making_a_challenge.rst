@@ -67,7 +67,7 @@ A solve script can be useful locally during development to check that the challe
 
     solution_image: ./solution
 
-This option behaves similarly to the ``image`` option :ref:`above <docker-config>`. In this case, a docker image will be built from the ``solution`` directory. To test if a challenge is solvable, this image will be ran with the challenge location as command line arguments. For example, for a TCP service a string like ``203.0.113.43:1337`` will be passed. For a website service, it will be the URL. Therefore, if you are using a container, make sure it runs the script using ``ENTRYPOINT`` in `exec form <https://docs.docker.com/engine/reference/builder/#entrypoint>`_ instead of ``CMD`` in the ``Dockerfile`` so that command line arguments get passed correctly. The container should output just the flag on STDOUT if the challenge was solved successfully.
+This option behaves similarly to the ``image`` option :ref:`above <docker-config>`. In this case, a docker image will be built from the ``solution`` directory. To test if a challenge is solvable, this image will be ran with the challenge location as command line arguments. For example, a command line argument can be a string like ``203.0.113.43:1337``. Therefore, if you are using a container, make sure it runs the script using ``ENTRYPOINT`` in `exec form <https://docs.docker.com/engine/reference/builder/#entrypoint>`_ instead of ``CMD`` in the ``Dockerfile`` so that command line arguments get passed correctly. The container should output just the flag on STDOUT if the challenge was solved successfully.
 
 If this seems complicated, check out the practical TODO example.
 
