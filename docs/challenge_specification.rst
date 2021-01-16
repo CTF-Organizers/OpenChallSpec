@@ -333,7 +333,7 @@ user_display
       * - Type
         - String
 
-  Defines how services with this type will be shown to players. Variables can be substituted in by typing the variable name immediately enclosed in curly brackets. Additional whitespace between the name and bracket MUST NOT be supported. For example, for the ``tcp`` service type, if the hostname of a service is ``192.0.2.69`` and the port is ``1337``, the ctf platform will show the string ``nc 192.0.2.69 1337`` in the challenge details.
+  Defines how services with this type will be shown to players and solve scripts. Variables can be substituted in by typing the variable name immediately enclosed in curly brackets. Additional whitespace between the name and bracket MUST NOT be supported. For example, for the ``tcp`` service type, if the hostname of a service is ``192.0.2.69`` and the port is ``1337``, the ctf platform will show the string ``nc 192.0.2.69 1337`` in the challenge details.
 
   The variables in the substitution context depend on the environment. If the service is in predefined_services_, all needed variables MUST be provided in that same object. Otherwise, if the service is automatically deployed with a service_ or deployment_ configuration, it is the job of the deployment script to provide a context with the required variables. Deployment scripts MUST attempt to deploy services of a custom type they don't know of and format user_display by providing the ``host``, ``port`` and ``url`` variables in the substitution context.
 
@@ -629,7 +629,7 @@ A solution script that can be run to validate the challenge is functioning and s
 
 The string defines the docker image for this solution. This can be defined in the same ways as :ref:`the image in a service container<deploy-image>`.
 
-The solution container usually needs to know on which host and port a service runs on. This information is passed as a string in a command line argument when running a docker container. The string MUST be formatted by separating the host and port of the service with a colon, like this: ``192.0.2.69:1337``
+The solution container usually needs to know on which host and port a service runs on. This information is passed as a string in a command line argument when running a docker container. The string MUST be formatted using the user_display_ of service types, meaning that for example, for tcp services, a string like ``nc 192.0.2.69 1337`` will be given.
 
 If a challenge has multiple services, they MUST be passed as separate command line arguments in the following order:
 1. All predefined_services_, in the order they are defined
