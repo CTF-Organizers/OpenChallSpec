@@ -401,7 +401,7 @@ This field is a simplified syntax of the deployment_ field. It consists of 3 man
 
     type: docker
     containers:
-      challenge:
+      default:
         image: <image>
         services:
           - type: <type>
